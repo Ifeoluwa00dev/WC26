@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bebas Neue", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Premium WC26 dark-theme sport palette mapping */
+  --color-primary: #0A1628;
+  --color-accent: #F5A623;
+  --color-accent-red: #C8102E;
+  --color-surface-card: #111C2E;
+  --color-surface-bg: #07101E;
+  --color-muted-metal: #6B7A99;
+  --color-text-light: #E8EDF5;
+}
+
+/* Custom scrollbar styling for premium dark theme feeling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0A1628;
+}
+::-webkit-scrollbar-thumb {
+  background: #1F304A;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #F5A623;
+}
+
+/* Standard glassmorphism presets */
+.glass-effect {
+  background: rgba(17, 28, 46, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(107, 122, 153, 0.15);
+}
+
+.glass-effect-gold {
+  background: rgba(17, 28, 46, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(245, 166, 35, 0.25);
+}
+
+.glow-gold {
+  box-shadow: 0 0 15px rgba(245, 166, 35, 0.15);
+}

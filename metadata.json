@@ -1,0 +1,6 @@
+{
+  "name": "WC26",
+  "description": "Fan intelligence and analytical platform for the 2026 FIFA World Cup featuring squad ratings, age analysis, team comparisons, and tournament intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
