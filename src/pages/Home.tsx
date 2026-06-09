@@ -44,33 +44,31 @@ export default function Home() {
 
   // Fetch Teams
   useEffect(() => {
-    const fetchHomeData = async () => {
-      try {
-       const json = await apiFetch('/api/teams');
-if (json.status === 'ok') {
-  setTeams(json.data);
-}
-        
-        const mRes = await apiFetch('/api/matches');
-        const mJson = await mRes.json();
-        if (mJson.status === 'ok') {
-          // Filter 3 matches representing key highlighted matchups (ENG, ARG, FRA, ESP matches)
-          const allMatches: Match[] = mJson.data;
-          const selections = allMatches.filter(m => 
-            m.id === 'match_g_a_1' || // USA vs Mexico or Argentina
-            m.id === 'match_g_d_1' || // France vs Senegal
-            m.id === 'match_g_e_1'    // Spain vs Switzerland
-          ).slice(0, 3);
-          setFeaturedMatches(selections);
-        }
-      } catch (err) {
-        console.error('Error fetching home data', err);
-      } finally {
-        setLoading(false);
+  const fetchHomeData = async () => {
+    try {
+      const json = await apiFetch('/api/teams');
+      if (json.status === 'ok') {
+        setTeams(json.data);
       }
-    };
-    fetchHomeData();
-  }, []);
+      
+      const mJson = await apiFetch('/api/matches');
+      if (mJson.status === 'ok') {
+        const allMatches: Match[] = mJson.data;
+        const selections = allMatches.filter(m => 
+          m.id === 'match_g_a_1' ||
+          m.id === 'match_g_d_1' ||
+          m.id === 'match_g_e_1'
+        ).slice(0, 3);
+        setFeaturedMatches(selections);
+      }
+    } catch (err) {
+      console.error('Error fetching home data', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchHomeData();
+}, []);
 
   // Top favorites for win probability spotlight
   const favorites = [...teams]
