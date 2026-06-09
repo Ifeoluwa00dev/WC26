@@ -38,9 +38,8 @@ export default function Groups() {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const res = await apiFetch('/api/groups');
-        const json = await res.json();
-        if (json.status === 'ok') {
+        const json = await apiFetch('/api/groups');
+if (json.status === 'ok') {
           setGroups(json.data);
         }
       } catch (err) {

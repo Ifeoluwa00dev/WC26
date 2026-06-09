@@ -69,12 +69,11 @@ I am your tactical AI analyst. Ask me any advanced football intelligence or stat
     setIsLoading(true);
 
     try {
-      const res = await apiFetch('/api/gemini/analyst', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: rawText })
-      });
-      const result = await res.json();
+      const result = await apiFetch('/api/gemini/analyst', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ prompt: rawText })
+});
       
       let botResponse = '';
       if (result.status === 'ok' || result.status === 'fallback') {

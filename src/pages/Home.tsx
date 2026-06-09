@@ -46,11 +46,10 @@ export default function Home() {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const res = await apiFetch('/api/teams');
-        const json = await res.json();
-        if (json.status === 'ok') {
-          setTeams(json.data);
-        }
+       const json = await apiFetch('/api/teams');
+if (json.status === 'ok') {
+  setTeams(json.data);
+}
         
         const mRes = await apiFetch('/api/matches');
         const mJson = await mRes.json();

@@ -35,9 +35,8 @@ export default function Teams() {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await apiFetch('/api/teams');
-        const json = await res.json();
-        if (json.status === 'ok') {
+        const json = await apiFetch('/api/teams');
+if (json.status === 'ok') {
           setTeams(json.data);
         }
       } catch (err) {

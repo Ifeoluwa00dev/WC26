@@ -27,7 +27,7 @@ export default function Footer() {
 
         <div className="sm:flex sm:items-center sm:justify-between text-xs text-[#6B7A99] leading-none">
           <p className="flex items-center gap-1">
-            <span>Built by Google AI Studio Build</span>
+           
             <span>&copy; {new Date().getFullYear()} WC26 Fan Intelligence Platform.</span>
           </p>
           <p className="flex items-center gap-1.5 mt-2 sm:mt-0 uppercase tracking-widest font-mono">
