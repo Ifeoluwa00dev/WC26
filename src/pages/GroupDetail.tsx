@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import { apiFetch } from '../lib/apiFetch';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { LayoutGrid, Calendar, HelpCircle, Trophy, Edit3, ArrowLeft, RefreshCw, Star } from 'lucide-react';
@@ -38,8 +38,7 @@ export default function GroupDetail() {
   const fetchGroupDetail = async () => {
     if (!groupLetter) return;
     try {
-      const res = await fetch(`/api/groups/${groupLetter.toLowerCase()}`);
-      const json = await res.json();
+      const json = await apiFetch(`/api/groups/${groupLetter.toLowerCase()}`);
       if (json.status === 'ok') {
         setData(json.data);
       }
