@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import { apiFetch } from '../lib/apiFetch';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Play, Clipboard, Flame, HelpCircle, ChevronRight, Trophy, Sparkles, Sliders } from 'lucide-react';
@@ -46,13 +46,13 @@ export default function Home() {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const res = await fetch('/api/teams');
+        const res = await apiFetch('/api/teams');
         const json = await res.json();
         if (json.status === 'ok') {
           setTeams(json.data);
         }
         
-        const mRes = await fetch('/api/matches');
+        const mRes = await apiFetch('/api/matches');
         const mJson = await mRes.json();
         if (mJson.status === 'ok') {
           // Filter 3 matches representing key highlighted matchups (ENG, ARG, FRA, ESP matches)

@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import { apiFetch } from '../lib/apiFetch';
 import { useState, useEffect, useRef } from 'react';
 import { Send, Bot, X, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
 
@@ -69,7 +69,7 @@ I am your tactical AI analyst. Ask me any advanced football intelligence or stat
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/gemini/analyst', {
+      const res = await apiFetch('/api/gemini/analyst', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: rawText })

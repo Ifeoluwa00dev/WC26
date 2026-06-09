@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import { apiFetch } from '../lib/apiFetch';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Search, SlidersHorizontal, ChevronRight, User } from 'lucide-react';
@@ -35,7 +35,7 @@ export default function Teams() {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await fetch('/api/teams');
+        const res = await apiFetch('/api/teams');
         const json = await res.json();
         if (json.status === 'ok') {
           setTeams(json.data);

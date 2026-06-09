@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import { apiFetch } from '../lib/apiFetch';
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import {
@@ -40,7 +40,7 @@ export default function Compare() {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await fetch('/api/teams');
+        const res = await apiFetch('/api/teams');
         const json = await res.json();
         if (json.status === 'ok') {
           setAllTeams(json.data);

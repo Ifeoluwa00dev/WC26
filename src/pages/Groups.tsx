@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import { apiFetch } from '../lib/apiFetch';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LayoutGrid, Flame, ArrowRight, ShieldAlert, Award } from 'lucide-react';
@@ -38,7 +38,7 @@ export default function Groups() {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const res = await fetch('/api/groups');
+        const res = await apiFetch('/api/groups');
         const json = await res.json();
         if (json.status === 'ok') {
           setGroups(json.data);
