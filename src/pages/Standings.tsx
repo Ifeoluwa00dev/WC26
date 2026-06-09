@@ -10,7 +10,8 @@ import {
 } from 'lucide-react';
 import { Team, Match, GroupStandings } from '../types';
 import Flag from '../components/Flag';
-import { fetchCompetitionData, getFlagEmoji } from '../lib/footballApi';
+import { getFlagEmoji } from '../lib/footballApi';
+import { apiFetch } from '../lib/apiFetch';
 
 const mapAPIToGroups = (apiResult: any, code: 'WC'|'PL'): GroupSummary[] => {
   const standingsRaw = apiResult.standings || [];
@@ -170,40 +171,40 @@ export default function Standings() {
   const [scoreAwayInput, setScoreAwayInput] = useState<number>(0);
 
   const fetchStandingsData = async () => {
-    setLoading(true);
-    setApiError(null);
-    try {
-      // 1. Fetch standings
-      const standingsRes = await fetchCompetitionData('/standings');
-      setCompetitionCode(standingsRes.code);
-      const mappedGroups = mapAPIToGroups(standingsRes.data, standingsRes.code);
-      setGroupsData(mappedGroups);
+  setLoading(true);
+  setApiError(null);
+  try {
+    const standingsJson = await apiFetch('/api/football/standings');
+    const standingsData = standingsJson.data;
+    const code = standingsJson.status === 'ok' ? 'WC' : 'PL';
+    setCompetitionCode('WC');
+    const mappedGroups = mapAPIToGroups(standingsData, 'WC');
+    setGroupsData(mappedGroups);
 
-      // 2. Fetch matches
-      const matchesRes = await fetchCompetitionData('/matches');
-      const mappedMatches = mapAPIToMatches(matchesRes.data, matchesRes.code);
-      setMatches(mappedMatches);
+    const matchesJson = await apiFetch('/api/football/matches');
+    const matchesData = matchesJson.data;
+    const mappedMatches = mapAPIToMatches(matchesData, 'WC');
+    setMatches(mappedMatches);
 
-      // 3. Extract unique teams to build allTeams
-      const extractedTeams: Team[] = [];
-      const seenTeamIds = new Set<string>();
-      mappedGroups.forEach(g => {
-        g.standings.forEach(row => {
-          if (!seenTeamIds.has(row.team.id)) {
-            seenTeamIds.add(row.team.id);
-            extractedTeams.push(row.team);
-          }
-        });
+    const extractedTeams: Team[] = [];
+    const seenTeamIds = new Set<string>();
+    mappedGroups.forEach(g => {
+      g.standings.forEach(row => {
+        if (!seenTeamIds.has(row.team.id)) {
+          seenTeamIds.add(row.team.id);
+          extractedTeams.push(row.team);
+        }
       });
-      setAllTeams(extractedTeams);
-      
-    } catch (err: any) {
-      console.error('Error fetching standings datasets', err);
-      setApiError(err.message || 'Failed to fetch soccer data. Please verify your token or try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
+    setAllTeams(extractedTeams);
+
+  } catch (err: any) {
+    console.error('Error fetching standings datasets', err);
+    setApiError(err.message || 'Failed to fetch data.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchStandingsData();
