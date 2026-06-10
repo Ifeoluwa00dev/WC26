@@ -638,7 +638,40 @@ app.get('/api/football/standings', async (req, res) => {
 app.get('/api/football/matches', async (req, res) => {
   try {
     const data = await getFootballData('/competitions/WC/matches', true);
-    res.json({ status: 'ok', data });
+    
+    const matches = (data.matches || []).map((m: any) => ({
+      id: String(m.id),
+      group_letter: m.group ? m.group.replace('GROUP_', '') : null,
+      team_home_id: String(m.homeTeam.id),
+      team_away_id: String(m.awayTeam.id),
+      home_team: {
+        id: String(m.homeTeam.id),
+        name: m.homeTeam.shortName || m.homeTeam.name,
+        flag: m.homeTeam.tla || '',
+        slug: (m.homeTeam.shortName || m.homeTeam.name).toLowerCase().replace(/\s+/g, '-'),
+      },
+      away_team: {
+        id: String(m.awayTeam.id),
+        name: m.awayTeam.shortName || m.awayTeam.name,
+        flag: m.awayTeam.tla || '',
+        slug: (m.awayTeam.shortName || m.awayTeam.name).toLowerCase().replace(/\s+/g, '-'),
+      },
+      score_home: m.score?.fullTime?.home ?? null,
+      score_away: m.score?.fullTime?.away ?? null,
+      match_date: m.utcDate,
+      venue: m.venue || 'TBD',
+      stage: m.stage === 'GROUP_STAGE' ? 'Group'
+           : m.stage === 'LAST_32' ? 'Round of 32'
+           : m.stage === 'LAST_16' ? 'Round of 16'
+           : m.stage === 'QUARTER_FINALS' ? 'Quarterfinals'
+           : m.stage === 'SEMI_FINALS' ? 'Semifinals'
+           : m.stage === 'FINAL' ? 'Final'
+           : 'Group',
+      played: m.status === 'FINISHED' || m.status === 'AWARDED',
+      status: m.status,
+    }));
+
+    res.json({ status: 'ok', data: { matches } });
   } catch (error: any) {
     res.status(500).json({ status: 'error', error: error.message });
   }
