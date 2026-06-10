@@ -9,6 +9,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
+import { apiFetch } from '../lib/apiFetch';
 import {
   ArrowLeft, Shield, Users, Trophy, Calendar, Sparkles, Star, GitCompare, UserCheck, Play
 } from 'lucide-react';
@@ -64,11 +65,14 @@ export default function TeamDetail() {
     const fetchTeamDetail = async () => {
       if (!countrySlug) return;
       try {
-        const res = await fetch(`/api/teams/${countrySlug.toLowerCase()}`);
-        const json = await res.json();
-        if (json.status === 'ok') {
-          setData(json.data);
-        }
+        const json = await apiFetch(`/api/teams/enriched`);
+if (json.status === 'ok') {
+  const teamData = json.data.find((t: any) => 
+    t.slug === countrySlug?.toLowerCase() || 
+    t.id === countrySlug?.toLowerCase()
+  );
+  if (teamData) setData(teamData);
+}
       } catch (err) {
         console.error('Error fetching team detail', err);
       } finally {
@@ -107,23 +111,26 @@ export default function TeamDetail() {
   };
 
   const getSortedRoster = () => {
-    const sorted = [...squad];
-    sorted.sort((a, b) => {
-      if (squadSortBy === 'AGE') {
-        return sortOrder === 'ASC' ? a.age - b.age : b.age - a.age;
-      }
-      if (squadSortBy === 'POSITION') {
-        // Custom position weights: GK -> DF -> MF -> FW
-        const weights = { GK: 1, DF: 2, MF: 3, FW: 4 };
-        const wA = weights[a.position] || 9;
-        const wB = weights[b.position] || 9;
-        return sortOrder === 'ASC' ? wA - wB : wB - wA;
-      }
-      // RATING is default
-      return sortOrder === 'ASC' ? a.rating - b.rating : b.rating - a.rating;
-    });
-    return sorted;
-  };
+  const roster = data?.real_squad?.length ? data.real_squad : squad;
+  const sorted = [...roster];
+  sorted.sort((a: any, b: any) => {
+    if (squadSortBy === 'AGE') {
+      return sortOrder === 'ASC' 
+        ? (a.age || 0) - (b.age || 0) 
+        : (b.age || 0) - (a.age || 0);
+    }
+    if (squadSortBy === 'POSITION') {
+      const weights: Record<string, number> = { GK: 1, DF: 2, MF: 3, FW: 4 };
+      const wA = weights[a.position] || 9;
+      const wB = weights[b.position] || 9;
+      return sortOrder === 'ASC' ? wA - wB : wB - wA;
+    }
+    return sortOrder === 'ASC' 
+      ? (a.rating || 0) - (b.rating || 0) 
+      : (b.rating || 0) - (a.rating || 0);
+  });
+  return sorted;
+};
 
   // Color mappings for positional rows
   const getPositionStyles = (pos: 'GK' | 'DF' | 'MF' | 'FW') => {
@@ -310,25 +317,24 @@ export default function TeamDetail() {
               </tr>
             </thead>
             <tbody>
-              {getSortedRoster().map((p) => (
-                <tr
-                  key={p.id}
-                  className={`border-b last:border-none border-[#6B7A99]/10 transition-all font-semibold ${getPositionStyles(p.position)}`}
-                >
-                  <td className="px-4 py-3.5 text-center font-mono text-[#6B7A99]">{p.shirt_number}</td>
-                  <td className="px-4 py-3.5 font-bold text-sm tracking-wide text-[#E8EDF5]">{p.name}</td>
-                  <td className="px-4 py-3.5 text-center font-mono">
-                    <span className="px-2 py-0.5 bg-[#07101E] rounded font-bold text-[10px]" style={{ color: positionColors[p.position] }}>
-                      {p.position}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3.5 text-center font-mono text-accent font-black text-sm">{p.rating}</td>
-                  <td className="px-4 py-3.5 text-[#E8EDF5]/90 hover:text-accent transition-colors">
-                    {p.club}
-                  </td>
-                  <td className="px-4 py-3.5 text-center font-mono text-[#E8EDF5]/80">{p.age}</td>
-                </tr>
-              ))}
+              {getSortedRoster().map((p: any) => (
+  <tr key={p.id} className={`border-b last:border-none border-[#6B7A99]/10 transition-all font-semibold ${getPositionStyles(p.position)}`}>
+    <td className="px-4 py-3.5 text-center font-mono text-[#6B7A99]">{p.shirtNumber || p.shirt_number || '-'}</td>
+    <td className="px-4 py-3.5 font-bold text-sm tracking-wide text-[#E8EDF5]">{p.name}</td>
+    <td className="px-4 py-3.5 text-center font-mono">
+      <span className="px-2 py-0.5 bg-[#07101E] rounded font-bold text-[10px]" style={{ color: positionColors[p.position] || '#6B7A99' }}>
+        {p.position || 'N/A'}
+      </span>
+    </td>
+    <td className="px-4 py-3.5 text-center font-mono text-accent font-black text-sm">
+      {p.rating || '-'}
+    </td>
+    <td className="px-4 py-3.5 text-[#E8EDF5]/90">
+      {p.club || p.nationality || '-'}
+    </td>
+    <td className="px-4 py-3.5 text-center font-mono text-[#E8EDF5]/80">{p.age || '-'}</td>
+  </tr>
+))}
             </tbody>
           </table>
         </div>
