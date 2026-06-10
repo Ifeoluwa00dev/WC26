@@ -67,6 +67,61 @@ app.get('/api/teams', (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Enriched teams with real API squad data
+app.get('/api/teams/enriched', async (req, res) => {
+  try {
+    const apiData = await getFootballData('/competitions/WC/teams', true);
+    const apiTeams = apiData.teams || [];
+
+    const apiTeamMap: Record<string, any> = {};
+    apiTeams.forEach((t: any) => {
+      apiTeamMap[t.tla?.toUpperCase()] = t;
+    });
+
+    const enriched = dbInstance.teams.map(team => {
+      const roster = dbInstance.players.filter(p => p.team_id === team.id);
+      const avgRank = roster.length > 0
+        ? roster.reduce((sum, p) => sum + p.rating, 0) / roster.length
+        : 0;
+      const sortedRoster = [...roster].sort((a, b) => b.rating - a.rating);
+      const topPlayer = sortedRoster[0]
+        ? { name: sortedRoster[0].name, rating: sortedRoster[0].rating }
+        : null;
+
+      const tla = team.id.toUpperCase();
+      const apiTeam = apiTeamMap[tla];
+      const realSquad = apiTeam?.squad || [];
+      const realCoach = apiTeam?.coach;
+
+      return {
+        ...team,
+        avg_rating: parseFloat(avgRank.toFixed(1)),
+        top_player: topPlayer,
+        squad_size: realSquad.length || roster.length,
+        coach_name: realCoach?.name || team.coach_name,
+        coach_nationality: realCoach?.nationality || team.coach_nationality,
+        real_squad: realSquad.map((p: any) => {
+          const dob = p.dateOfBirth;
+          const age = dob
+            ? new Date().getFullYear() - new Date(dob).getFullYear()
+            : null;
+          return {
+            id: String(p.id),
+            name: p.name,
+            position: p.position,
+            age,
+            nationality: p.nationality,
+            shirtNumber: p.shirtNumber,
+          };
+        }),
+      };
+    });
+
+    res.json({ status: 'ok', data: enriched });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // 2. Individual Team Page Details & Stats
 app.get('/api/teams/:slug', (req, res) => {
@@ -696,65 +751,7 @@ app.get('/api/football/scorers', async (req, res) => {
   }
 });
 
-app.get('/api/teams/enriched', async (req, res) => {
-  try {
-    const apiData = await getFootballData('/competitions/WC/teams', true);
-    const apiTeams = apiData.teams || [];
 
-    // Build a lookup map from TLA to real squad
-    const apiTeamMap: Record<string, any> = {};
-    apiTeams.forEach((t: any) => {
-      apiTeamMap[t.tla?.toUpperCase()] = t;
-    });
-
-    // Merge real squad data into data-store teams
-    const enriched = dbInstance.teams.map(team => {
-      const roster = dbInstance.players.filter(p => p.team_id === team.id);
-      const avgRank = roster.length > 0
-        ? roster.reduce((sum, p) => sum + p.rating, 0) / roster.length
-        : 0;
-      const sortedRoster = [...roster].sort((a, b) => b.rating - a.rating);
-      const topPlayer = sortedRoster[0]
-        ? { name: sortedRoster[0].name, rating: sortedRoster[0].rating }
-        : null;
-
-      // Find matching API team by TLA
-      const tla = team.id.toUpperCase();
-      const apiTeam = apiTeamMap[tla];
-
-      // Use real squad from API if available
-      const realSquad = apiTeam?.squad || [];
-      const realCoach = apiTeam?.coach;
-
-      return {
-        ...team,
-        avg_rating: parseFloat(avgRank.toFixed(1)),
-        top_player: topPlayer,
-        squad_size: realSquad.length || roster.length,
-        coach_name: realCoach?.name || team.coach_name,
-        coach_nationality: realCoach?.nationality || team.coach_nationality,
-        real_squad: realSquad.map((p: any) => {
-          const dob = p.dateOfBirth;
-          const age = dob
-            ? new Date().getFullYear() - new Date(dob).getFullYear()
-            : null;
-          return {
-            id: String(p.id),
-            name: p.name,
-            position: p.position,
-            age,
-            nationality: p.nationality,
-            shirtNumber: p.shirtNumber,
-          };
-        }),
-      };
-    });
-
-    res.json({ status: 'ok', data: enriched });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 // Setup Vite Dev Server / Prod files fallback
 async function bootServer() {
