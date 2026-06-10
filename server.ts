@@ -648,13 +648,13 @@ app.get('/api/football/matches', async (req, res) => {
       home_team: {
         id: String(m.homeTeam.id),
         name: m.homeTeam.shortName || m.homeTeam.name || 'TBD',
-        flag: m.homeTeam.tla || '',
+        flag: getFlagEmoji(m.homeTeam.name, m.homeTeam.tla),
         slug: (m.homeTeam?.shortName || m.homeTeam?.name || 'tbd').toLowerCase().replace(/\s+/g, '-'),
       },
       away_team: {
         id: String(m.awayTeam.id),
         name: m.awayTeam.shortName || m.awayTeam.name || 'TBD',
-        flag: m.awayTeam.tla || '',
+        flag: getFlagEmoji(m.awayTeam.name, m.awayTeam.tla),
         slug: (m.awayTeam?.shortName || m.awayTeam?.name || 'tbd').toLowerCase().replace(/\s+/g, '-'),
       },
       score_home: m.score?.fullTime?.home ?? null,
