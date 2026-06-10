@@ -65,13 +65,9 @@ export default function TeamDetail() {
     const fetchTeamDetail = async () => {
       if (!countrySlug) return;
       try {
-        const json = await apiFetch(`/api/teams/enriched`);
+      const json = await apiFetch(`/api/teams/${countrySlug?.toLowerCase()}`);
 if (json.status === 'ok') {
-  const teamData = json.data.find((t: any) => 
-    t.slug === countrySlug?.toLowerCase() || 
-    t.id === countrySlug?.toLowerCase()
-  );
-  if (teamData) setData(teamData);
+  setData(json.data);
 }
       } catch (err) {
         console.error('Error fetching team detail', err);
