@@ -54,11 +54,9 @@ export default function Home() {
       const mJson = await apiFetch('/api/matches');
       if (mJson.status === 'ok') {
         const allMatches: Match[] = mJson.data;
-        const selections = allMatches.filter(m => 
-          m.id === 'match_g_a_1' ||
-          m.id === 'match_g_d_1' ||
-          m.id === 'match_g_e_1'
-        ).slice(0, 3);
+        const selections = allMatches
+  .filter(m => m.stage === 'Group')
+  .slice(0, 3);
         setFeaturedMatches(selections);
       }
     } catch (err) {
