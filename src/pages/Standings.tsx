@@ -55,7 +55,7 @@ const mapAPIToGroups = (apiResult: any, code: 'WC'|'PL'): GroupSummary[] => {
   } else {
     // WC standings mapper
     return standingsRaw.map((st: any) => {
-      const groupLetter = st.group ? st.group.replace('GROUP_', '') : 'A';
+      const groupLetter = st.group ? st.group.replace('GROUP_', '').replace('Group ', '') : 'A';
       const table = st.table || [];
       return {
         letter: groupLetter,
@@ -96,8 +96,8 @@ const mapAPIToMatches = (apiResult: any, code: 'WC'|'PL'): Match[] => {
     
     const homeTeam: Team = {
       id: String(m.homeTeam.id),
-      name: m.homeTeam.shortName || m.homeTeam.name,
-      slug: (m.homeTeam.shortName || m.homeTeam.name).toLowerCase().replace(/\s+/g, '-'),
+      name: m.homeTeam.shortName || m.homeTeam.name || 'TBD',
+      slug: (m.homeTeam?.shortName || m.homeTeam?.name || 'unknown').toLowerCase().replace(/\s+/g, '-'),
       group_letter: groupLetter,
       coach_name: 'Unknown Coach',
       coach_nationality: 'Unknown',
@@ -112,8 +112,8 @@ const mapAPIToMatches = (apiResult: any, code: 'WC'|'PL'): Match[] => {
 
     const awayTeam: Team = {
       id: String(m.awayTeam.id),
-      name: m.awayTeam.shortName || m.awayTeam.name,
-      slug: (m.awayTeam.shortName || m.awayTeam.name).toLowerCase().replace(/\s+/g, '-'),
+      name: m.awayTeam.shortName || m.awayTeam.name || 'TBD' ,
+      slug: (m.awayTeam?.shortName || m.awayTeam?.name || 'unknown').toLowerCase().replace(/\s+/g, '-'),
       group_letter: groupLetter,
       coach_name: 'Unknown Coach',
       coach_nationality: 'Unknown',
