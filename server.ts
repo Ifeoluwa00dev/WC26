@@ -769,7 +769,34 @@ app.get('/api/football/teams', async (req, res) => {
 app.get('/api/football/scorers', async (req, res) => {
   try {
     const data = await getFootballData('/competitions/WC/scorers', true);
-    res.json({ status: 'ok', data });
+    const scorers = (data.scorers || []).map((s: any, index: number) => ({
+      rank: index + 1,
+      player: {
+        id: String(s.player.id),
+        name: s.player.name,
+        nationality: s.player.nationality,
+        dateOfBirth: s.player.dateOfBirth,
+        age: s.player.dateOfBirth
+          ? 2026 - parseInt(s.player.dateOfBirth.substring(0, 4))
+          : null,
+        position: s.player.position,
+      },
+      team: {
+        id: String(s.team.id),
+        name: s.team.shortName || s.team.name,
+        tla: s.team.tla,
+        flag: getFlagEmoji(s.team.name, s.team.tla),
+      },
+      goals: s.goals ?? 0,
+      assists: s.assists ?? 0,
+      penalties: s.penalties ?? 0,
+      playedMatches: s.playedMatches ?? 0,
+      goalsPerMatch: s.playedMatches
+        ? parseFloat((s.goals / s.playedMatches).toFixed(2))
+        : 0,
+    }));
+
+    res.json({ status: 'ok', data: { scorers } });
   } catch (error: any) {
     res.status(500).json({ status: 'error', error: error.message });
   }
