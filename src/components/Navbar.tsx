@@ -40,8 +40,9 @@ export default function Navbar({ onOpenAnalyst }: NavbarProps) {
   const navItems = [
     { label: 'Groups', path: '/groups', icon: LayoutGrid },
     { label: 'Teams', path: '/teams', icon: Users },
+    { label: 'Fixtures', path: '/fixtures', icon: CalendarDays },
     { label: 'Compare', path: '/compare', icon: GitCompare },
-    { label: 'Live Bracket', path: '/standings', icon: CalendarDays },
+    { label: 'Live Bracket', path: '/standings', icon: Trophy },
     { label: 'Global Intel', path: '/analytics', icon: BarChart2 },
   ];
 

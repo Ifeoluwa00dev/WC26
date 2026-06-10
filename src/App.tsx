@@ -16,6 +16,7 @@ import Groups from './pages/Groups';
 import GroupDetail from './pages/GroupDetail';
 import Teams from './pages/Teams';
 import TeamDetail from './pages/TeamDetail';
+import Fixtures from './pages/Fixtures';
 import Compare from './pages/Compare';
 import Standings from './pages/Standings';
 import Analytics from './pages/Analytics';
@@ -55,6 +56,7 @@ function AppContent() {
               <Route path="/groups" element={<Groups />} />
               <Route path="/groups/:groupLetter" element={<GroupDetail />} />
               <Route path="/teams" element={<Teams />} />
+              <Route path="/fixtures" element={<Fixtures />} />
               <Route path="/teams/:countrySlug" element={<TeamDetail />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="/standings" element={<Standings />} />
