@@ -271,14 +271,7 @@ if (json.status === 'ok') {
           <div className="flex items-center gap-2 text-xs">
             <span className="text-[#6B7A99] uppercase font-bold text-[9px] font-mono leading-none">Roster Sort:</span>
             <div className="flex bg-[#111C2E] border border-[#6B7A99]/25 p-1 rounded-md shrink-0">
-              <button
-                onClick={() => handleSort('RATING')}
-                className={`px-2.5 py-1 rounded text-[9px] font-extrabold uppercase leading-none ${
-                    squadSortBy === 'RATING' ? 'bg-accent text-primary' : 'text-[#6B7A99]'
-                }`}
-              >
-                Rating {squadSortBy === 'RATING' && (sortOrder === 'ASC' ? '↑' : '↓')}
-              </button>
+              
               <button
                 onClick={() => handleSort('AGE')}
                 className={`px-2.5 py-1 rounded text-[9px] font-extrabold uppercase leading-none ${
@@ -303,33 +296,25 @@ if (json.status === 'ok') {
         <div className="overflow-x-auto bg-[#111C2E] border border-[#6B7A99]/15 rounded-xl shadow-xl">
           <table className="w-full text-xs text-left text-[#E8EDF5]">
             <thead>
-              <tr className="bg-[#0A1628] border-b border-[#6B7A99]/15 uppercase tracking-widest text-[9px] text-[#6B7A99] font-bold font-mono">
-                <th className="px-4 py-3 text-center w-12">#</th>
-                <th className="px-4 py-3">Player Name</th>
-                <th className="px-4 py-3 text-center">Position</th>
-                <th className="px-4 py-3 text-center">Rating</th>
-                <th className="px-4 py-3">Current Club</th>
-                <th className="px-4 py-3 text-center">Age</th>
-              </tr>
-            </thead>
+  <tr className="bg-[#0A1628] border-b border-[#6B7A99]/15 uppercase tracking-widest text-[9px] text-[#6B7A99] font-bold font-mono">
+    <th className="px-4 py-3 text-center w-12">#</th>
+    <th className="px-4 py-3">Player Name</th>
+    <th className="px-4 py-3 text-center">Position</th>
+    <th className="px-4 py-3 text-center">Age</th>
+  </tr>
+</thead>
             <tbody>
               {getSortedRoster().map((p: any) => (
-  <tr key={p.id} className={`border-b last:border-none border-[#6B7A99]/10 transition-all font-semibold ${getPositionStyles(p.position)}`}>
-    <td className="px-4 py-3.5 text-center font-mono text-[#6B7A99]">{p.shirtNumber || p.shirt_number || '-'}</td>
-    <td className="px-4 py-3.5 font-bold text-sm tracking-wide text-[#E8EDF5]">{p.name}</td>
-    <td className="px-4 py-3.5 text-center font-mono">
-      <span className="px-2 py-0.5 bg-[#07101E] rounded font-bold text-[10px]" style={{ color: positionColors[p.position] || '#6B7A99' }}>
-        {p.position || 'N/A'}
-      </span>
-    </td>
-    <td className="px-4 py-3.5 text-center font-mono text-accent font-black text-sm">
-  {p.rating ?? '—'}
-</td>
-<td className="px-4 py-3.5 text-[#E8EDF5]/90">
-  {p.club ?? '—'}
-</td>
-    <td className="px-4 py-3.5 text-center font-mono text-[#E8EDF5]/80">{p.age || '-'}</td>
-  </tr>
+  <tr key={p.id} className={`...`}>
+  <td className="px-4 py-3.5 text-center font-mono text-[#6B7A99]">{p.shirt_number || '-'}</td>
+  <td className="px-4 py-3.5 font-bold text-sm tracking-wide text-[#E8EDF5]">{p.name}</td>
+  <td className="px-4 py-3.5 text-center font-mono">
+    <span className="px-2 py-0.5 bg-[#07101E] rounded font-bold text-[10px]" style={{ color: positionColors[p.position] }}>
+      {p.position}
+    </span>
+  </td>
+  <td className="px-4 py-3.5 text-center font-mono text-[#E8EDF5]/80">{p.age}</td>
+</tr>
 ))}
             </tbody>
           </table>
