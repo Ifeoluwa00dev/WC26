@@ -638,8 +638,9 @@ app.get('/api/football/standings', async (req, res) => {
 app.get('/api/football/matches', async (req, res) => {
   try {
     const data = await getFootballData('/competitions/WC/matches', true);
-    
-    const matches = (data.matches || []).map((m: any) => ({
+    const matches = (data.matches || []).filter((m: any) => 
+  m.homeTeam && m.awayTeam
+).map((m: any) => ({
       id: String(m.id),
       group_letter: m.group ? m.group.replace('GROUP_', '') : null,
       team_home_id: String(m.homeTeam.id),
