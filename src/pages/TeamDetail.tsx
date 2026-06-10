@@ -323,11 +323,11 @@ if (json.status === 'ok') {
       </span>
     </td>
     <td className="px-4 py-3.5 text-center font-mono text-accent font-black text-sm">
-      {p.rating || '-'}
-    </td>
-    <td className="px-4 py-3.5 text-[#E8EDF5]/90">
-      {p.club || p.nationality || '-'}
-    </td>
+  {p.rating ?? '—'}
+</td>
+<td className="px-4 py-3.5 text-[#E8EDF5]/90">
+  {p.club ?? '—'}
+</td>
     <td className="px-4 py-3.5 text-center font-mono text-[#E8EDF5]/80">{p.age || '-'}</td>
   </tr>
 ))}

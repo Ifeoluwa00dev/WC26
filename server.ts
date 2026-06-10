@@ -149,19 +149,19 @@ app.get('/api/teams/:slug', async (req, res) => {
           const dob = p.dateOfBirth;
           const age = dob ? 2026 - parseInt(dob.substring(0, 4)) : 25;
           return {
-            id: String(p.id),
-            team_id: team.id,
-            name: p.name,
-            position: p.position === 'Goalkeeper' ? 'GK'
-                    : p.position === 'Defence' ? 'DF'
-                    : p.position === 'Midfield' ? 'MF'
-                    : p.position === 'Offence' ? 'FW'
-                    : 'MF',
-            rating: 75 + (Number(p.id) % 20),
-            club: p.nationality || 'International',
-            age,
-            shirt_number: p.shirtNumber || 0,
-          };
+  id: String(p.id),
+  team_id: team.id,
+  name: p.name,
+  position: p.position === 'Goalkeeper' ? 'GK'
+          : p.position === 'Defence' ? 'DF'
+          : p.position === 'Midfield' ? 'MF'
+          : p.position === 'Offence' ? 'FW'
+          : 'MF',
+  rating: null,
+  club: null,
+  age,
+  shirt_number: p.shirtNumber || 0,
+};
         });
       }
     } catch {
