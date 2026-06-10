@@ -147,7 +147,7 @@ app.get('/api/teams/:slug', async (req, res) => {
         }
         realSquad = (apiTeam.squad || []).map((p: any) => {
           const dob = p.dateOfBirth;
-          const age = dob ? new Date().getFullYear() - new Date(dob).getFullYear() : 25;
+          const age = dob ? 2026 - parseInt(dob.substring(0, 4)) : 25;
           return {
             id: String(p.id),
             team_id: team.id,
