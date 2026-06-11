@@ -92,42 +92,39 @@ if (json.status === 'ok') {
 
   // Fetch individual team detail for comparisons
   useEffect(() => {
-    const fetchComparisonData = async () => {
-      if (!team1Slug || !team2Slug) return;
-      setLoading(true);
+  const fetchComparisonData = async () => {
+    if (!team1Slug || !team2Slug) return;
+    setLoading(true);
 
-      try {
-        const [res1, res2] = await Promise.all([
-          fetch(`/api/teams/${team1Slug.toLowerCase()}`),
-          fetch(`/api/teams/${team2Slug.toLowerCase()}`)
-        ]);
+    try {
+      const [json1, json2] = await Promise.all([
+        apiFetch(`/api/teams/${team1Slug.toLowerCase()}`),
+        apiFetch(`/api/teams/${team2Slug.toLowerCase()}`)
+      ]);
 
-        const json1 = await res1.json();
-        const json2 = await res2.json();
-
-        if (json1.status === 'ok') {
-          setTeam1Data({
-            team: json1.data.team,
-            squad: json1.data.squad,
-            metrics: computeMetrics(json1.data.squad, json1.data.team)
-          });
-        }
-        if (json2.status === 'ok') {
-          setTeam2Data({
-            team: json2.data.team,
-            squad: json2.data.squad,
-            metrics: computeMetrics(json2.data.squad, json2.data.team)
-          });
-        }
-      } catch (err) {
-        console.error('Error fetching comparison data', err);
-      } finally {
-        setLoading(false);
+      if (json1.status === 'ok') {
+        setTeam1Data({
+          team: json1.data.team,
+          squad: json1.data.squad,
+          metrics: computeMetrics(json1.data.squad, json1.data.team)
+        });
       }
-    };
+      if (json2.status === 'ok') {
+        setTeam2Data({
+          team: json2.data.team,
+          squad: json2.data.squad,
+          metrics: computeMetrics(json2.data.squad, json2.data.team)
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching comparison data', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchComparisonData();
-  }, [team1Slug, team2Slug]);
+  fetchComparisonData();
+}, [team1Slug, team2Slug]);
 
   const handleDropdownChange = (index: 1 | 2, slug: string) => {
     const mutableParams = new URLSearchParams(searchParams);
