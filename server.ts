@@ -297,9 +297,10 @@ app.get('/api/groups/:letter', async (req, res) => {
 
     // Find the matching group from real standings
     const standingsRaw = standingsData.standings || [];
-    const groupStanding = standingsRaw.find((s: any) =>
-      s.group === `GROUP_${groupUpper}` || s.group === groupUpper
-    );
+    console.log('Available groups:', standingsRaw.map((s: any) => s.group));
+const groupStanding = standingsRaw.find((s: any) =>
+  s.group === `GROUP_${groupUpper}` || s.group === groupUpper
+);
 
     if (!groupStanding) {
       return res.status(404).json({ error: 'Group not found' });
