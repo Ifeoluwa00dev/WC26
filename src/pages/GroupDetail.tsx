@@ -350,9 +350,7 @@ export default function GroupDetail() {
           </h2>
 
           <div className="overflow-hidden bg-[#111C2E] border border-[#6B7A99]/15 rounded-xl shadow-xl p-4">
-            <p className="text-[10px] text-[#6B7A99] uppercase font-bold tracking-wider mb-3 leading-none">
-              ★ Historical FIFA World Cup match counts (Wins / Draws / Losses) ★
-            </p>
+            
             <div className="overflow-x-auto">
               <table className="w-full text-[10px] text-center font-semibold font-mono text-[#E8EDF5]">
                 <thead>
