@@ -103,6 +103,14 @@ I am your tactical AI analyst. Ask me any advanced football intelligence or stat
       setIsLoading(false);
     }
   };
+   const renderInline = (text: string) => {
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+  return parts.map((part, i) =>
+    i % 2 === 1
+      ? <strong key={i} className="text-accent font-bold">{part}</strong>
+      : part
+  );
+};
 
   const clearChat = () => {
     setMessages([
@@ -131,7 +139,7 @@ I am your tactical AI analyst. Ask me any advanced football intelligence or stat
                 AI Fan Intelligence Analyst
               </h3>
               <p className="text-[10px] text-accent font-medium tracking-widest uppercase">
-                Powered by Gemini models
+                Powered by AI models
               </p>
             </div>
           </div>
@@ -176,18 +184,19 @@ I am your tactical AI analyst. Ask me any advanced football intelligence or stat
               >
                 {/* Parse Markdown representation with basic splits to keep formatting gorgeous */}
                 <div className="space-y-2 whitespace-pre-wrap">
+                 
                   {m.text.split('\n').map((line, lIdx) => {
-                    if (line.startsWith('###')) {
-                      return <h4 key={lIdx} className="text-accent text-sm font-bold mt-2 tracking-wide font-sans">{line.replace('###', '').trim()}</h4>;
-                    }
-                    if (line.startsWith('* ')) {
-                      return <li key={lIdx} className="ml-2 text-xs list-disc text-[#E8EDF5]/95">{line.replace('* ', '').trim()}</li>;
-                    }
-                    if (line.trim().startsWith('- ')) {
-                      return <li key={lIdx} className="ml-2 text-xs list-dash text-[#E8EDF5]/90">{line.replace('- ', '').trim()}</li>;
-                    }
-                    return <p key={lIdx} className="text-xs font-sans text-[#E8EDF5]/90">{line}</p>;
-                  })}
+  if (line.startsWith('###')) {
+    return <h4 key={lIdx} className="text-accent text-sm font-bold mt-2 tracking-wide font-sans">{line.replace('###', '').trim()}</h4>;
+  }
+  if (line.startsWith('* ')) {
+    return <li key={lIdx} className="ml-2 text-xs list-disc text-[#E8EDF5]/95">{renderInline(line.replace('* ', '').trim())}</li>;
+  }
+  if (line.trim().startsWith('- ')) {
+    return <li key={lIdx} className="ml-2 text-xs list-dash text-[#E8EDF5]/90">{renderInline(line.replace('- ', '').trim())}</li>;
+  }
+  return <p key={lIdx} className="text-xs font-sans text-[#E8EDF5]/90">{renderInline(line)}</p>;
+})}
                 </div>
                 <span className="block mt-1 text-[9px] text-[#6B7A99] text-right font-mono select-none">
                   {m.timestamp}
