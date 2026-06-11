@@ -42,7 +42,7 @@ function AppContent() {
       <Navbar onOpenAnalyst={() => handleOpenAnalystWithPrompt()} />
 
       {/* Content Viewport */}
-      <main className="flex-1 relative">
+      <main className="flex-1 relative pt-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
