@@ -135,16 +135,16 @@ export async function fetchWithRateLimit(url: string, options: RequestInit = {})
   }
 
   // Header injections from env configuration
-  let apiToken = 'd0b2bdb325';
-  if (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_FOOTBALL_API_TOKEN) {
-    apiToken = process.env.NEXT_PUBLIC_FOOTBALL_API_TOKEN;
-  } else {
-    try {
-      const metaEnv = (import.meta as any).env;
-      if (metaEnv && metaEnv.NEXT_PUBLIC_FOOTBALL_API_TOKEN) {
-        apiToken = metaEnv.NEXT_PUBLIC_FOOTBALL_API_TOKEN;
-      }
-    } catch {
+  let apiToken = '';
+if (typeof process !== 'undefined' && process.env && process.env.VITE_FOOTBALL_API_TOKEN) {
+  apiToken = process.env.VITE_FOOTBALL_API_TOKEN;
+} else {
+  try {
+    const metaEnv = (import.meta as any).env;
+    if (metaEnv && metaEnv.VITE_FOOTBALL_API_TOKEN) {
+      apiToken = metaEnv.VITE_FOOTBALL_API_TOKEN;
+    }
+  } catch {
       // safe fallback
     }
   }
