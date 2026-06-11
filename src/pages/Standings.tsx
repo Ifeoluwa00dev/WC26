@@ -24,22 +24,22 @@ const mapAPIToGroups = (apiResult: any, code: 'WC'|'PL'): GroupSummary[] => {
       const slice = table.slice(i * 4, (i + 1) * 4);
       groups.push({
         letter,
-        standings: slice.map((row: any, idx: number) => ({
-          team: {
-            id: String(row.team?.id || ''),
-            name: row.team?.shortName || row.team?.name || 'TBD',
-            slug: (row.team?.shortName || row.team?.name || 'tbd').toLowerCase().replace(/\s+/g, '-'),
-            group_letter: letter,
-            coach_name: 'Unknown Coach',
-            coach_nationality: 'Unknown',
-            confederation: 'UEFA',
-            win_probability: 2.0,
-            win_factors: 'Calculated dynamically.',
-            fifa_ranking: row.position,
-            best_case: 'Knockouts',
-            realistic_target: 'Mid table',
-            flag: getFlagEmoji(row.team.name, row.team.tla)
-          },
+        standings: table.filter((row: any) => row.team).map((row: any) => ({
+  team: {
+    id: String(row.team?.id || ''),
+    name: row.team?.shortName || row.team?.name || 'TBD',
+    slug: (row.team?.shortName || row.team?.name || 'tbd').toLowerCase().replace(/\s+/g, '-'),
+    group_letter: groupLetter,
+    coach_name: 'Unknown Coach',
+    coach_nationality: 'Unknown',
+    confederation: 'FIFA',
+    win_probability: 2.0,
+    win_factors: 'Group Stage Contenders',
+    fifa_ranking: row.position,
+    best_case: 'Knockouts',
+    realistic_target: 'Group Stage',
+    flag: getFlagEmoji(row.team?.name || '', row.team?.tla || '')
+  },
           played: row.playedGames,
           won: row.won,
           drawn: row.draw,
@@ -73,7 +73,7 @@ const mapAPIToGroups = (apiResult: any, code: 'WC'|'PL'): GroupSummary[] => {
             fifa_ranking: row.position,
             best_case: 'Knockouts',
             realistic_target: 'Group Stage',
-            flag: getFlagEmoji(row.team.name, row.team.tla)
+            flag: getFlagEmoji(row.team?.name || '', row.team?.tla || '')
           },
           played: row.playedGames,
           won: row.won,
