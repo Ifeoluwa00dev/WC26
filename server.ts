@@ -299,7 +299,7 @@ app.get('/api/groups/:letter', async (req, res) => {
     const standingsRaw = standingsData.standings || [];
     console.log('Available groups:', standingsRaw.map((s: any) => s.group));
 const groupStanding = standingsRaw.find((s: any) =>
-  s.group === `GROUP_${groupUpper}` || s.group === groupUpper
+  s.group === `Group ${groupUpper}`
 );
 
     if (!groupStanding) {
