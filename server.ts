@@ -284,78 +284,105 @@ app.get('/api/groups', (req, res) => {
 });
 
 // 4. Single Group Details
-app.get('/api/groups/:letter', (req, res) => {
+app.get('/api/groups/:letter', async (req, res) => {
   try {
     const { letter } = req.params;
     const groupUpper = letter.toUpperCase();
-    const group = dbInstance.groups.find(g => g.letter === groupUpper);
-    if (!group) {
-      return res.status(404).json({ error: 'Group letter not found' });
-    }
-    
-    const groupTeams = dbInstance.teams.filter(t => t.group_letter === groupUpper);
-    const standings = dbInstance.getGroupStandings(groupUpper);
-    const fixtures = dbInstance.matches.filter(m => m.group_letter === groupUpper);
-    
-    // Enriched teams with coach, rating details
-    const enrichedTeamCards = groupTeams.map(t => {
-      const roster = dbInstance.players.filter(p => p.team_id === t.id);
-      const avg = roster.length > 0 ? (roster.reduce((sum, p) => sum + p.rating, 0) / roster.length) : 0;
-      const best = [...roster].sort((a, b) => b.rating - a.rating)[0];
-      return {
-        id: t.id,
-        name: t.name,
-        flag: t.flag,
-        coach_name: t.coach_name,
-        win_probability: t.win_probability,
-        average_rating: parseFloat(avg.toFixed(1)),
-        key_player: best ? { name: best.name, rating: best.rating } : null
-      };
-    });
-    
-    // H2H Matrix: Generates deterministic 4x4 matching grid
-    const matrix: Record<string, Record<string, string>> = {};
-    groupTeams.forEach(t1 => {
-      matrix[t1.id] = {};
-      groupTeams.forEach(t2 => {
-        if (t1.id === t2.id) {
-          matrix[t1.id][t2.id] = '-';
-        } else {
-          // Deterministic ratio based on FIFA rankings
-          const diff = t2.fifa_ranking - t1.fifa_ranking;
-          if (diff > 25) {
-            matrix[t1.id][t2.id] = '3W 0D 0L';
-          } else if (diff < -25) {
-            matrix[t1.id][t2.id] = '0W 0D 3L';
-          } else if (diff > 5) {
-            matrix[t1.id][t2.id] = '2W 1D 1L';
-          } else if (diff < -5) {
-            matrix[t1.id][t2.id] = '1W 1D 2L';
-          } else {
-            matrix[t1.id][t2.id] = '1W 2D 1L';
-          }
-        }
-      });
-    });
 
-    const editorial = `Group ${groupUpper} shapes up to be a fascinating contest. ` + 
-      `The top seeds ${standings[0]?.team.name || 'are heavy favorites'}, while ` +
-      `${standings[3]?.team.name || 'others'} will look to execute direct tactical counters. ` +
-      `Expect high operational transitions and intense tactical matches.`;
+    // Fetch real standings and matches from API
+    const [standingsData, matchesData] = await Promise.all([
+      getFootballData('/competitions/WC/standings', true),
+      getFootballData('/competitions/WC/matches', true)
+    ]);
+
+    // Find the matching group from real standings
+    const standingsRaw = standingsData.standings || [];
+    const groupStanding = standingsRaw.find((s: any) =>
+      s.group === `GROUP_${groupUpper}` || s.group === groupUpper
+    );
+
+    if (!groupStanding) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    // Map real standings
+    const standings = (groupStanding.table || []).map((row: any) => ({
+      team: {
+        id: String(row.team.id),
+        name: row.team.shortName || row.team.name,
+        flag: getFlagEmoji(row.team.name, row.team.tla),
+        slug: (row.team.shortName || row.team.name).toLowerCase().replace(/\s+/g, '-'),
+        confederation: 'FIFA',
+        win_probability: 0,
+        fifa_ranking: row.position,
+      },
+      played: row.playedGames,
+      won: row.won,
+      drawn: row.draw,
+      lost: row.lost,
+      gf: row.goalsFor,
+      ga: row.goalsAgainst,
+      gd: row.goalDifference,
+      points: row.points,
+    }));
+
+    // Map real matches for this group
+    const allMatches = matchesData.matches || [];
+    const groupMatches = allMatches
+      .filter((m: any) => m.group === `GROUP_${groupUpper}`)
+      .map((m: any) => ({
+        id: String(m.id),
+        group_letter: groupUpper,
+        team_home_id: String(m.homeTeam?.id),
+        team_away_id: String(m.awayTeam?.id),
+        home_team: {
+          id: String(m.homeTeam?.id),
+          name: m.homeTeam?.shortName || m.homeTeam?.name || 'TBD',
+          flag: getFlagEmoji(m.homeTeam?.name || '', m.homeTeam?.tla || ''),
+          slug: (m.homeTeam?.shortName || m.homeTeam?.name || 'tbd').toLowerCase().replace(/\s+/g, '-'),
+        },
+        away_team: {
+          id: String(m.awayTeam?.id),
+          name: m.awayTeam?.shortName || m.awayTeam?.name || 'TBD',
+          flag: getFlagEmoji(m.awayTeam?.name || '', m.awayTeam?.tla || ''),
+          slug: (m.awayTeam?.shortName || m.awayTeam?.name || 'tbd').toLowerCase().replace(/\s+/g, '-'),
+        },
+        score_home: m.score?.fullTime?.home ?? null,
+        score_away: m.score?.fullTime?.away ?? null,
+        match_date: m.utcDate,
+        venue: m.venue || 'TBD',
+        stage: 'Group',
+        played: m.status === 'FINISHED' || m.status === 'AWARDED',
+      }));
+
+    // Get team cards from standings
+    const teamCards = standings.map((s: any) => ({
+      id: s.team.id,
+      name: s.team.name,
+      flag: s.team.flag,
+      win_probability: s.team.win_probability,
+      average_rating: 0,
+      key_player: null,
+    }));
+
+    const editorial = `Group ${groupUpper} shapes up to be a fascinating contest. ` +
+      `${standings[0]?.team.name || 'The top seed'} leads the standings, while ` +
+      `${standings[standings.length - 1]?.team.name || 'others'} will look to turn things around. ` +
+      `Expect intense tactical battles throughout.`;
 
     res.json({
       status: 'ok',
       data: {
-        group,
+        group: { letter: groupUpper, nickname: `Group ${groupUpper}`, difficulty: 'Competitive' },
         standings,
-        team_cards: enrichedTeamCards,
-        fixtures,
+        team_cards: teamCards,
+        fixtures: groupMatches,
         editorial,
-        h2h_matrix: matrix
+        h2h_matrix: {}
       }
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ status: 'error', error: error.message });
   }
 });
 
