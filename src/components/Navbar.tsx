@@ -153,7 +153,13 @@ export default function Navbar({ onOpenAnalyst }: NavbarProps) {
               )}
             </div>
 
-            
+            <button
+              onClick={onOpenAnalyst}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-accent text-primary font-bold text-xs uppercase tracking-wider hover:bg-amber-300 active:scale-95 transition-all shadow-md glow-gold"
+            >
+              <Bot className="h-4 w-4" />
+              AI Analyst
+            </button>
           </div>
 
           {/* Mobile Buttons */}
