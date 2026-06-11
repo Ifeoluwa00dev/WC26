@@ -718,7 +718,7 @@ Use high-level professional coaching concepts like: "half-spaces", "low blocks",
 Answer the query concisely with premium formatting, elegant headings, bullet points, and high analytical composure. Avoid flowery phrases or conversational greetings unless brief. Always prioritize real squad metadata we maintain.`;
 
     const response = await client.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-2.0-flash',
       contents: prompt,
       config: {
         systemInstruction: sysInstruction,
