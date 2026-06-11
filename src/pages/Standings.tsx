@@ -26,9 +26,9 @@ const mapAPIToGroups = (apiResult: any, code: 'WC'|'PL'): GroupSummary[] => {
         letter,
         standings: slice.map((row: any, idx: number) => ({
           team: {
-            id: String(row.team.id),
-            name: row.team.shortName || row.team.name,
-            slug: (row.team.shortName || row.team.name).toLowerCase().replace(/\s+/g, '-'),
+            id: String(row.team?.id || ''),
+            name: row.team?.shortName || row.team?.name || 'TBD',
+            slug: (row.team?.shortName || row.team?.name || 'tbd').toLowerCase().replace(/\s+/g, '-'),
             group_letter: letter,
             coach_name: 'Unknown Coach',
             coach_nationality: 'Unknown',
