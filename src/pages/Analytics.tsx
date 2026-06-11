@@ -5,7 +5,8 @@
 
 import { useState, useEffect } from 'react';
 import { Link as ReactLink } from 'react-router-dom';
-import { fetchCompetitionData, getFlagEmoji } from '../lib/footballApi';
+import { getFlagEmoji } from '../lib/footballApi';
+import { apiFetch } from '../lib/apiFetch';
 
 const mapAPIToAnalytics = (teamsResult: any, scorersResult: any, code: 'WC'|'PL'): UIAnalytics => {
   const teamsRaw = teamsResult?.teams || [];
@@ -205,28 +206,34 @@ export default function Analytics() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
-      setLoading(true);
-      setApiError(null);
-      try {
-        // Fetch teams and scorers in parallel
-        const [teamsRes, scorersRes] = await Promise.all([
-          fetchCompetitionData('/teams'),
-          fetchCompetitionData('/scorers')
-        ]);
-        
-        setCompetitionCode(teamsRes.code);
-        const compiled = mapAPIToAnalytics(teamsRes.data, scorersRes.data, teamsRes.code);
-        setData(compiled);
-      } catch (err: any) {
-        console.error('Error fetching global tournament analytics', err);
-        setApiError(err.message || 'Failed to sync live soccer analytics.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAnalytics();
-  }, []);
+  const fetchAnalytics = async () => {
+    setLoading(true);
+    setApiError(null);
+    try {
+      const [teamsJson, scorersJson] = await Promise.all([
+        apiFetch('/api/football/teams'),
+        apiFetch('/api/football/scorers')
+      ]);
+
+      const teamsData = teamsJson.data;
+      const scorersData = scorersJson.data;
+
+      setCompetitionCode('WC');
+      const compiled = mapAPIToAnalytics(
+        { teams: teamsData.teams || [] },
+        { scorers: scorersData.scorers || [] },
+        'WC'
+      );
+      setData(compiled);
+    } catch (err: any) {
+      console.error('Error fetching global tournament analytics', err);
+      setApiError(err.message || 'Failed to sync live soccer analytics.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchAnalytics();
+}, []);
 
   if (loading) {
     return (
