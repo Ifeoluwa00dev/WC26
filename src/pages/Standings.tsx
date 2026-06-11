@@ -176,15 +176,9 @@ export default function Standings() {
   try {
     const standingsJson = await apiFetch('/api/football/standings');
     const standingsData = standingsJson.data;
-    const code = standingsJson.status === 'ok' ? 'WC' : 'PL';
     setCompetitionCode('WC');
     const mappedGroups = mapAPIToGroups(standingsData, 'WC');
     setGroupsData(mappedGroups);
-
-    const matchesJson = await apiFetch('/api/football/matches');
-    const matchesData = matchesJson.data;
-    const mappedMatches = mapAPIToMatches(matchesData, 'WC');
-    setMatches(mappedMatches);
 
     const extractedTeams: Team[] = [];
     const seenTeamIds = new Set<string>();
@@ -199,8 +193,17 @@ export default function Standings() {
     setAllTeams(extractedTeams);
 
   } catch (err: any) {
-    console.error('Error fetching standings datasets', err);
-    setApiError(err.message || 'Failed to fetch data.');
+    console.error('Error fetching standings', err);
+    setApiError(err.message || 'Failed to fetch standings.');
+  }
+
+  try {
+    const matchesJson = await apiFetch('/api/football/matches');
+    const mappedMatches = mapAPIToMatches(matchesJson.data, 'WC');
+    setMatches(mappedMatches);
+  } catch {
+    console.warn('Matches fetch failed');
+    setMatches([]);
   } finally {
     setLoading(false);
   }
